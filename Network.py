@@ -18,8 +18,14 @@ class Network():
 		return 1.0/(1.0+np.exp(-z))
 		
 	def feedForward(self, input): #Push data trough network, get prediction
-		return None
-		
+    		h = self.numLayers - 2
+    		a=[self.sigmoid(np.dot(self.weights,input)-self.biases[0])]
+    
+   	 	for i in range(1,h+1):
+        		a.append(self.sigmoid(np.dot(self.weights[i],a[i-1])-self.biases[i]))
+
+    		return a[-1]
+	
 	#Main function for processing traning data and updating network using SGD
 	def train(self, trainigData, epochs, batchSize, learningRate, testData = None):
 		n= len(trainigData)
