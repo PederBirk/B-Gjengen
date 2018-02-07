@@ -1,18 +1,14 @@
-import numpy as 
+import numpy as np
 import random
 
 class Network():
-	numLayers
-	nodesInLayer[]
-	biases[]
-	weights[]
 	
 	def __init__(self, nodesInLayer):
 		self.numLayers = len(nodesInLayer)
 		self.nodesInLayer = nodesInLayer
 		self.biases = []
 		self.weights = []
-		for y in nodesInLayer[1:]
+		for y in nodesInLayer[1:]:
 			self.biases.append(np.random.randn(y,1)) #init biases with random numbers
 			
 		for x, y in zip(nodesInLayer[:-1], nodesInLayer[1:]):
