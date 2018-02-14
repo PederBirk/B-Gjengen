@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import json
 
 class Network():
 	
@@ -77,6 +78,14 @@ class Network():
 			nablaW[-layer] = np.dot(delta, activations[-layer-1].transpose())
 		
 		return (nablaB, nablaW)
+    
+	def save(self, filename):
+		data = {"nodesInLayer": self.nodesInLayer, "weights": [w.tolist() for w in self.weights], "biases": [b.tolist() for b in self.biases]}
+		f = open(filename, "w")
+		json.dump(data, f)
+		f.close()
+		
+		
 		
 	#Runs test data and returns % of data correctly indentified
 	def evaluate(self, testData):
@@ -86,6 +95,15 @@ class Network():
 	#Returns partial derivatives
 	def costDerivative(self, output, expectedOutput):
 		return (output-expectedOutput)
+
+def load(filename):
+    f = open(filename, "r")
+    data = json.load(f)
+    f.close()
+    net = Network(data["nodesInLayer"])
+    net.weights = [np.array(w) for w in data["weights"]]
+    net.biases = [np.array(b) for b in data["biases"]]
+    return net
 	
 	
 def sigmoid(z):
