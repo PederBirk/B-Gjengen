@@ -16,12 +16,11 @@ class Network():
 		
 	def feedForward(self, input): #Push data trough network, get prediction
 		h = self.numLayers - 2
-		a=[sigmoid(np.dot(self.weights,input)-self.biases[0])]
-	
+		a = [sigmoid(np.dot(self.weights[0],input)+self.biases[0])]
 		for i in range(1,h+1):
-			a.append(sigmoid(np.dot(self.weights[i],a[i-1])-self.biases[i]))
-			return a[-1]
-		
+			a.append(sigmoid(np.dot(self.weights[i],a[i-1])+self.biases[i]))
+		return a[-1]
+	
 	#Main function for processing traning data and updating network using SGD
 	def train(self, trainingData, epochs, batchSize, learningRate, testData = None):
 		if testData : nTest = len(testData)
@@ -31,6 +30,7 @@ class Network():
 			batches = []
 			batches = [ trainingData[k:k + batchSize]
 			                               for k in range(0, n, batchSize)] #Partiton training data into batches
+			print("started epoch ", j)
 			for batch in batches:
 				self.updateBatch(batch, learningRate) #Run update batch for each batch
 				
@@ -93,3 +93,4 @@ def sigmoid(z):
 	
 def sigmoidPrime(z):
 	return sigmoid(z)*(1-sigmoid(z))
+
