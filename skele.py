@@ -3,6 +3,7 @@ import numpy as np
 
 #Takes binary image and returns skeletized version
 def skeletize(img):
+	img = cv2.bitwise_not(img)
 	skeleton = np.zeros(img.shape,np.uint8)
 	eroded = np.zeros(img.shape,np.uint8)
 	temp = np.zeros(img.shape,np.uint8)
@@ -17,4 +18,4 @@ def skeletize(img):
 		thresh, eroded = eroded, thresh # Swap instead of copy
 
 		if cv2.countNonZero(thresh) == 0:
-			return skeleton
+			return cv2.bitwise_not(skeleton)
