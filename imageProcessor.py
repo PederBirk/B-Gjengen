@@ -4,6 +4,8 @@ import numpy as np
 
 def getImgMat(path, thresh_lower = 180, thresh_upper = 255):
 	img = cv2.pyrDown(cv2.imread(path, cv2.IMREAD_UNCHANGED))
+	kernel = np.ones((7,7),np.float32)/49
+	img = cv2.filter2D(img,-1,kernel)
 	threshed_image = cv2.adaptiveThreshold(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,41,6)
 	return threshed_image
 
