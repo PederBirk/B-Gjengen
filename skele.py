@@ -3,15 +3,12 @@ import numpy as np
 
 #Takes binary image and returns skeletized version
 def skeletize(img):
-	np.divide(img,255)
 	skeleton = np.zeros(img.shape,np.uint8)
 	eroded = np.zeros(img.shape,np.uint8)
 	temp = np.zeros(img.shape,np.uint8)
 	thresh = img
-
 	kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
-
-	iters = 0
+	
 	while(True):
 		cv2.erode(thresh, kernel, eroded)
 		cv2.dilate(eroded, kernel, temp)
