@@ -25,7 +25,7 @@ def combine(a, b):
 	yMax = max(a.yPos+a.height, b.yPos+b.height)
 	yMin = min(a.yPos, b.yPos)
 	
-	char = np.zeros((yMax-yMin, xMax-xMin))
+	char = np.ones((yMax-yMin, xMax-xMin))*255
 	
 	char[a.yPos-yMin:a.yPos+a.height-yMin, a.xPos-xMin:a.xPos+a.width-xMin] = a.image
 	char[b.yPos-yMin:b.yPos+b.height-yMin, b.xPos-xMin:b.xPos+b.width-xMin] = b.image

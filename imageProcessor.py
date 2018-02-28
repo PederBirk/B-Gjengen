@@ -1,6 +1,7 @@
 import cv2
 import Character as ch
 import numpy as np
+import processCharacters as pc
 
 def getImgMat(path, thresh_lower = 180, thresh_upper = 255):
 	img = cv2.pyrDown(cv2.imread(path, cv2.IMREAD_UNCHANGED))
@@ -17,10 +18,14 @@ def extractCharacters(binImg, targetResolution = (45,45), thresh_lower = 180, th
 		if (h+w>25 and h+w<200): #disregard tiny and huge components
 			img = binImg[y:y+h,x:x+w]
 			char = ch.Character(img,x,y,w,h)
-			squareImage(char)
-			resize(char,targetResolution)
 			ret, char.image = cv2.threshold(char.image, thresh_lower, thresh_upper, cv2.THRESH_BINARY)
 			characters.append(char)
+			
+	pc.processCharacters(characters)
+	for char in characters:
+		squareImage(char)
+		resize(char,targetResolution)
+	
 	return characters
 
 def squareImage(char):
