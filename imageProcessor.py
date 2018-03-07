@@ -4,9 +4,10 @@ import numpy as np
 import processCharacters as pc
 
 def getImgMat(path, thresh_lower = 180, thresh_upper = 255):
-	img = cv2.pyrDown(cv2.imread(path, cv2.IMREAD_UNCHANGED))
-	kernel = np.ones((7,7),np.float32)/49
+	img = cv2.pyrDown(cv2.imread(path, cv2.COLOR_BGR2GRAY))
+	kernel = np.ones((6,6),np.float32)/36
 	img = cv2.filter2D(img,-1,kernel)
+	img = cv2.bitwise_not(img)
 	threshed_image = cv2.adaptiveThreshold(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,41,6)
 	return threshed_image
 
@@ -53,11 +54,10 @@ def resize(char,targetResolution):
 	char.image = cv2.resize(char.image,targetResolution)
 	ret, char.image = cv2.threshold(char.image, 128, 255, cv2.THRESH_BINARY)
 
-def drawCharacterBounds(source, characters):
-  image = source.clone()
-  for c in characters:
-    cv2.rectangle(image, (c.xPos, c.yPos), (c.xPos + c.width, c.yPos + c.height), (0, 0, 0))
-  return image
+def drawCharacterBounds(image, characters):
+	for c in characters:
+		cv2.rectangle(image, (c.xPos, c.yPos), (c.xPos + c.width, c.yPos + c.height), (0, 0, 0))
+	return image
 	
 def webcam():
 	cv2.namedWindow("preview")
@@ -75,16 +75,17 @@ def webcam():
 		if key == 27: # ESC
 			break
 		elif key == 32: # SPACE
-	  		# treat frame
-	  		cv2.imwrite("screencap.jpg", frame)
-	  		threshed_img = getImgMat("screencap.jpg")
-	  		cv2.waitKey(0)
-	  		cv2.imshow(threshed_img)
+			# treat frame
+			cv2.imwrite("screencap.jpg", frame)
+			threshed_img = getImgMat("screencap.jpg")
+			cv2.waitKey(0)
+			cv2.imshow("preview", threshed_img)
 	
-	  		characters = extractCharacters(threshed_img)
-	  		imgWithBounds = drawCharacterBounds(threshed_img, characters)
-	  		cv2.waitKey(0)
-	  		cv2.imshow(imgWithBounds)
-	  		break
+			characters = extractCharacters(threshed_img)
+			imgWithBounds = drawCharacterBounds(threshed_img, characters)
+			cv2.waitKey(0)
+			cv2.imshow("preview", imgWithBounds)
+			cv2.waitKey(0)
+			break
 	
 	cv2.destroyWindow("preview")
