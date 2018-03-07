@@ -10,14 +10,10 @@ class Classifier:
 
 	def classify(self,char):
 		img = char.image
-		#img = np.transpose(img)
-		img = cv2.bitwise_not(img)
-		img = np.divide(img, 255.0)
-		
-		cv2.imshow("test", img)
-		if cv2.waitKey(0) & 0xff == 27:
-			cv2.destroyAllWindows()
-		
+		img = np.transpose(img) #To match with mnist
+		img = cv2.bitwise_not(img) #Same
+		img = np.divide(img, 255.0)#Same
+
 		print(np.array(np.reshape(img, (784, 1))))
 		activation= self.network.feedForward(np.array(np.reshape(img, (784, 1))))
 		char.symbol= self.getSymbol(activation) 
