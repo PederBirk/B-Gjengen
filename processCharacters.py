@@ -39,11 +39,9 @@ def processCharacters(chars):
 	while i < len(chars)-1:
 		shouldCombine = False
 		if(charIntersectes(chars[i], chars[i+1]) or charIntersectes(chars[i+1], chars[i])):
-			print("intersect")
 			shouldCombine = True
 		
 		if(charsAbove(chars[i], chars[i+1])):
-			print("above")
 			shouldCombine = True
 		
 		if(shouldCombine): 
