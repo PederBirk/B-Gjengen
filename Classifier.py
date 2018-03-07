@@ -7,11 +7,25 @@ class Classifier:
 		self.network = network
 
 	def classify(self,char):
-		#implement
+		activation= network.feedForward(char.image)
+		char.symbol= getSymbol(activation) 
 		
 	def getSymbol(self,activation):
-		#implement
+		maxactivation = activation[0]
+		maxindex=0
+		for i in range(1,len(activation)):
+			if activation[i]>maxactivation:
+				maxactivation=activation[i]
+				maxindex=i
+			
+		return symbols[maxindex]
 	
 	def getProbSortedSymbols(self,char):
-		#implements
+		activation=network.feedForward(char.image)
+		zipped=zip(activation,range(len(activation)))
+		zipped = sort(zipped)
+		index = []
+		for element in zipped:
+			index.append(symbols[element[1]])
+		return index
 	
