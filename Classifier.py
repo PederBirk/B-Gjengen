@@ -2,7 +2,7 @@ import Network as nw
 
 class Classifier:
 	
-	def __init__(self,symbols, network):
+	def __init__(self, symbols, network):
 		self.symbols = symbols
 		self.network = network
 
@@ -28,4 +28,3 @@ class Classifier:
 		for element in zipped:
 			index.append(symbols[element[1]])
 		return index
-	

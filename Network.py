@@ -80,6 +80,7 @@ class Network():
 		return (nablaB, nablaW)
     
 	def save(self, filename):
+		print("saving network to file " + filename)
 		data = {"nodesInLayer": self.nodesInLayer, "weights": [w.tolist() for w in self.weights], "biases": [b.tolist() for b in self.biases]}
 		f = open(filename, "w")
 		json.dump(data, f)
@@ -103,6 +104,7 @@ def load(filename):
     net = Network(data["nodesInLayer"])
     net.weights = [np.array(w) for w in data["weights"]]
     net.biases = [np.array(b) for b in data["biases"]]
+    print("loaded network from " + filename)
     return net
 	
 	
