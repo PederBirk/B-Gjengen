@@ -5,8 +5,6 @@ import pickle
 from math import floor
 from os import listdir
 
-# TODO cleanup and run on cluster
-
 # reads raw image data from inPath into a two lists (train and test) of tuples consisting of
 # input data and correct output; for training data the correct output is vectorized, but for test data
 # it is the index of the symbol for compatibility with feedforward's output

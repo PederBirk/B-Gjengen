@@ -2,3 +2,5 @@
 __pycache__/*
 data/*
 *.swp
+NOTES
+shell.nix
