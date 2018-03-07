@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import Network
 
 class Character:
 	
@@ -19,3 +20,5 @@ class Character:
 		cv2.waitKey(0)
 		cv2.destroyAllWindows()
 		
+	def identifySymbol(self, net):
+		self.symbol =Network.net.feedforward(self.image)
