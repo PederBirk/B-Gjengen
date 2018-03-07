@@ -10,14 +10,11 @@ pathToData = './extracted_images/'
 nTrainingData = 10000
 nTestData = 1000
 
-# data = dl.loadData(symbols, nTrainingData, nTestData, pathToData)
+# dl.pickleJPEGData(pathToData, symbols)
 
-# with open('kaggle-dataset.pkl', 'wb') as f:
-# 	pickle.dump(data, f)
-
-with gzip.open('./kaggle-dataset.pkl.gz', 'rb') as f:
-	data = pickle.load(f)
+data = dl.loadPickledData('./extracted_images/', symbols)
 
 # train network
-net = NN.Network([2025,100, len(symbols)])
+net = NN.Network([2025, 100, 30, len(symbols)])
+net.symbols = symbols
 net.train(data['train'], 30, 100, 3.0, testData = data['test'])

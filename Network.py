@@ -69,7 +69,7 @@ class Network():
 		delta = self.costDerivative(activations[-1], expectedOutput) * sigmoidPrime(zs[-1]) #Find derivative of cost function
 		nablaB[-1] = delta
 		nablaW[-1] = np.dot(delta, activations[-2].transpose())
-		
+
 		for layer in range(2, self.numLayers): #starting at 2nd to last layer, work backwards and find gradient for biases and weights
 			z = zs[-layer]
 			sp = sigmoidPrime(z)
