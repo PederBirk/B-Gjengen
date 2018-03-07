@@ -52,6 +52,12 @@ def squareImage(char):
 def resize(char,targetResolution):
 	char.image = cv2.resize(char.image,targetResolution)
 	ret, char.image = cv2.threshold(char.image, 128, 255, cv2.THRESH_BINARY)
+
+def drawCharacterBounds(source, characters):
+  image = source.clone()
+  for c in characters:
+    cv2.rectangle(image, (c.xPos, c.yPos), (c.xPos + c.width, c.yPos + c.height), (0, 0, 0))
+  return image
 	
 def webcam():
 	cv2.namedWindow("preview")
@@ -61,12 +67,24 @@ def webcam():
 		rval, frame = vc.read()
 	else:
 		rval = False
-
+	
 	while rval:
 		cv2.imshow("preview", frame)
 		rval, frame = vc.read()
 		key = cv2.waitKey(20)
 		if key == 27: # ESC
 			break
+		elif key == 32: # SPACE
+	  		# treat frame
+	  		cv2.imwrite("screencap.jpg", frame)
+	  		threshed_img = getImgMat("screencap.jpg")
+	  		cv2.waitKey(0)
+	  		cv2.imshow(threshed_img)
+	
+	  		characters = extractCharacters(threshed_img)
+	  		imgWithBounds = drawCharacterBounds(threshed_img, characters)
+	  		cv2.waitKey(0)
+	  		cv2.imshow(imgWithBounds)
+	  		break
 	
 	cv2.destroyWindow("preview")
