@@ -6,8 +6,8 @@ import processCharacters as pc
 def getImgMat(path, thresh_lower = 180, thresh_upper = 255):
 	img = cv2.pyrDown(cv2.imread(path, cv2.COLOR_BGR2GRAY))
 	kernel = np.ones((6,6),np.float32)/36
-	img = cv2.filter2D(img,-1,kernel)
-	img = cv2.bitwise_not(img)
+	#img = cv2.filter2D(img,-1,kernel)
+	#img = cv2.bitwise_not(img)
 	threshed_image = cv2.adaptiveThreshold(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,41,6)
 	return threshed_image
 
@@ -35,7 +35,7 @@ def squareImage(char):
 		diff = w-h
 		padding = int(diff/2.0)
 		dim = (padding,w)
-		paddingMat = 255*np.ones(dim,dtype=np.uint8)
+		paddingMat = 225*np.ones(dim,dtype=np.uint8)
 		char.image = np.concatenate((paddingMat,char.image,paddingMat),0)
 	elif h > w:
 		diff = h-w
@@ -61,11 +61,8 @@ def drawCharacterBounds(image, characters):
 
 def drawClassifiedCharacters(image, classifier, characters):
 	for c in characters:
-		squareImage(c)
-		resize(c, (45,45))
 		classifier.classify(c)
-		# TODO print classified symbol!
-		cv2.putText(image, c.symbol, (c.xPos, c.yPos), cv.FONT_HERSHEY_PLAIN, 1, bottomLeftOrigin = True)
+		cv2.putText(image, c.symbol, (c.xPos, c.yPos), cv2.FONT_HERSHEY_PLAIN, 2, 0)
 	return image
 	
 def webcam(classifier):
@@ -78,27 +75,26 @@ def webcam(classifier):
 		rval = False
 	
 	while rval:
-		cv2.imshow("preview", frame)
+		#cv2.imshow("preview", frame)
 		rval, frame = vc.read()
 		key = cv2.waitKey(20)
 		if key == 27: # ESC
 			break
-		elif key == 32: # SPACE
-			# treat frame
-			cv2.imwrite("screencap.jpg", frame)
-			threshed_img = getImgMat("screencap.jpg")
-			cv2.waitKey(0)
-			cv2.imshow("preview", threshed_img)
+		
+		# treat frame
+		cv2.imwrite("screencap.jpg", frame)
+		threshed_img = getImgMat("screencap.jpg")
+		#cv2.waitKey(0)
+		#cv2.imshow("preview", threshed_img)
 	
-			characters = extractCharacters(threshed_img)
-			imgWithBounds = drawCharacterBounds(threshed_img, characters)
-			cv2.waitKey(0)
-			cv2.imshow("preview", imgWithBounds)
+		characters = extractCharacters(threshed_img, (45,45))
+		imgWithBounds = drawCharacterBounds(threshed_img, characters)
+		#cv2.waitKey(0)
+		#cv2.imshow("preview", imgWithBounds)
 
-			classifiedImg = drawClassifiedCharacters(imgWithBounds, classifier, characters)
-			cv2.imshow("preview", classfiedImg)
-			cv2.waitKey(0)
-			break
+		classifiedImg = drawClassifiedCharacters(imgWithBounds, classifier, characters)
+		cv2.imshow("preview", classifiedImg)
+		#cv2.waitKey(0)
 	
 	cv2.destroyWindow("preview")
 

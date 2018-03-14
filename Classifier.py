@@ -7,8 +7,8 @@ class Classifier:
 		self.network = network
 
 	def classify(self,char):
-		activation= network.feedForward(char.image)
-		char.symbol= getSymbol(activation) 
+		activation= self.network.feedForward(char.image.reshape((2025,1))/255)
+		char.symbol= self.getSymbol(activation) 
 		
 	def getSymbol(self,activation):
 		maxactivation = activation[0]
@@ -18,13 +18,13 @@ class Classifier:
 				maxactivation=activation[i]
 				maxindex=i
 			
-		return symbols[maxindex]
+		return self.symbols[maxindex]
 	
 	def getProbSortedSymbols(self,char):
-		activation=network.feedForward(char.image)
+		activation= self.network.feedForward(char.image)
 		zipped=zip(activation,range(len(activation)))
-		zipped = sort(zipped)
+		zipped.sort()
 		index = []
 		for element in zipped:
-			index.append(symbols[element[1]])
+			index.append(self.symbols[element[1]])
 		return index
