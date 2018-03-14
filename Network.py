@@ -7,13 +7,8 @@ class Network():
 	def __init__(self, nodesInLayer):
 		self.numLayers = len(nodesInLayer)
 		self.nodesInLayer = nodesInLayer
-		self.biases = []
-		self.weights = []
-		for y in nodesInLayer[1:]:
-			self.biases.append(np.random.randn(y,1)) #init biases with random numbers
-			
-		for x, y in zip(nodesInLayer[:-1], nodesInLayer[1:]):
-			self.weights.append(np.random.randn(y,x)) #init weights with random numbers
+		self.biases = [np.random.randn(y, 1) for y in nodesInLayer[1:]]
+		self.weights = [np.random.randn(y, x) for x, y in zip(nodesInLayer[:-1], nodesInLayer[1:])]
 		
 	def feedForward(self, input): #Push data trough network, get prediction
 		h = self.numLayers - 2
