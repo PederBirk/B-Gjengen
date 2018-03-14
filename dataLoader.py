@@ -32,15 +32,17 @@ def readImage(path):
 	return img.flatten()/255
 
 def loadPickledData(path, symbols):
-	data = { 'train': [], 'test': [] }
-	print("loaded symbols: ", end='')
+	data = { 'training-input': [], 'training-output': [], 'test-input': [], 'test-output': [] }
+	print("loading symbols...")
 	for symbol in symbols:
 		with gzip.open(path + symbol + '.pkl.gz', 'rb') as f:
 			symbolData = pickle.load(f)
-		data['train'].extend([(np.reshape(x[0], (45**2, 1)),
-								np.reshape(x[1], (len(x[1]), 1))) for x in symbolData['train']])
-		data['test'].extend([(np.reshape(x[0], (45**2, 1)),
-								x[1]) for x in symbolData['test']])
-		print(symbol + ' ', end='')
-	print()
+                data['training-input'].extend([np.reshape(inp, (45**2, 1)) for inp, outp in symbolData['train']])
+                data['training-output'].extend([np.reshape(outp, (len(outp), 1)) for inp, outp in symbolData['train']])
+                data['test-input'].extend([np.reshape(inp, (45**2, 1)) for inp, outp in symbolData['test']])
+                data['test-output'].extend([np.reshape(outp, (len(outp), 1)) for inp, outp in symbolData['test']])
+        data['training-input'] = np.array(data['training-input'])
+        data['training-output'] = np.array(data['training-output'])
+        data['test-input'] = np.array(data['test-input'])
+        data['test-output'] = np.array(data['test-output'])
 	return data
