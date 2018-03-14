@@ -4,18 +4,12 @@ import cv2
 
 class Classifier:
 	
-	def __init__(self,symbols, network):
+	def __init__(self, symbols, network):
 		self.symbols = symbols
 		self.network = network
 
 	def classify(self,char):
-		img = char.image
-		img = np.transpose(img) #To match with mnist
-		img = cv2.bitwise_not(img) #Same
-		img = np.divide(img, 255.0)#Same
-
-		print(np.array(np.reshape(img, (784, 1))))
-		activation= self.network.feedForward(np.array(np.reshape(img, (784, 1))))
+		activation= self.network.feedForward(char.image.reshape((2025,1))/255)
 		char.symbol= self.getSymbol(activation) 
 		
 	def getSymbol(self,activation):
@@ -29,11 +23,10 @@ class Classifier:
 		return self.symbols[maxindex]
 	
 	def getProbSortedSymbols(self,char):
-		activation=self.network.feedForward(char.image.flatten())
+		activation= self.network.feedForward(char.image)
 		zipped=zip(activation,range(len(activation)))
-		zipped = sort(zipped)
+		zipped.sort()
 		index = []
 		for element in zipped:
 			index.append(self.symbols[element[1]])
 		return index
-	
