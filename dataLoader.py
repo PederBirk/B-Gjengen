@@ -15,13 +15,13 @@ def pickleJPEGData(inPath, symbols): # TODO validation data?
 		files = [ readImage(inPath + symbol + '/' + f) for f in listdir(path) ]
 		nTrain = floor(len(files) * 0.9)
 		data['train'] = [(trainInput, vectorize(symbol, symbols)) for trainInput in files[:nTrain]]
-		data['test'] = [(testInput, symbols.index(symbol)) for testInput in files[nTrain:]]
+		data['test'] = [(testInput, vectorize(symbol, symbols)) for testInput in files[nTrain:]]
 		with open(inPath + symbol + '.pkl', 'wb') as f:
 			pickle.dump(data, f)
 
 #Create unit vector representation of symbol. Indexing is determined by 'symbols' list
 def vectorize(symbol, symbols):
-	output = np.zeros((len(symbols),1))
+	output = np.zeros(len(symbols))
 	output[symbols.index(symbol)] = 1
 	return output
 
@@ -29,18 +29,20 @@ def vectorize(symbol, symbols):
 def readImage(path):
 	img = cv2.imread(path,cv2.IMREAD_GRAYSCALE)
 	# tresh, binImg = cv2.threshold(img, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-	return img.flatten()/255
+	return img
 
 def loadPickledData(path, symbols):
-	data = { 'train': [], 'test': [] }
-	print("loaded symbols: ", end='')
+	data = { 'training-input': [], 'training-output': [], 'test-input': [], 'test-output': [] }
+	print("loading symbols...")
 	for symbol in symbols:
-		with gzip.open(path + symbol + '.pkl.gz', 'rb') as f:
-			symbolData = pickle.load(f)
-		data['train'].extend([(np.reshape(x[0], (45**2, 1)),
-								np.reshape(x[1], (len(x[1]), 1))) for x in symbolData['train']])
-		data['test'].extend([(np.reshape(x[0], (45**2, 1)),
-								x[1]) for x in symbolData['test']])
-		print(symbol + ' ', end='')
-	print()
+		with open(path + symbol + '.pkl', 'rb') as f:
+				symbolData = pickle.load(f)
+		data['training-input'].extend([inp for inp, outp in symbolData['train']])
+		data['training-output'].extend([outp for inp, outp in symbolData['train']])
+		data['test-input'].extend([inp for inp, outp in symbolData['test']])
+		data['test-output'].extend([outp for inp, outp in symbolData['test']])
+	data['training-input'] = np.array(data['training-input'])
+	data['training-output'] = np.array(data['training-output'])
+	data['test-input'] = np.array(data['test-input'])
+	data['test-output'] = np.array(data['test-output'])
 	return data
