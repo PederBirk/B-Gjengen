@@ -5,9 +5,12 @@ import processCharacters as pc
 
 def getImgMat(path, thresh_lower = 180, thresh_upper = 255):
 	img = cv2.pyrDown(cv2.imread(path, cv2.COLOR_BGR2GRAY))
-	kernel = np.ones((6,6),np.float32)/36
+	#img = cv2.GaussianBlur(img,(3,3),0)
+	#kernel = np.ones((3,3),np.float32)/9
 	#img = cv2.filter2D(img,-1,kernel)
-	#img = cv2.bitwise_not(img)
+	img = cv2.bitwise_not(img)
+	img = cv2.dilate(img,np.ones((3,3),np.uint8),iterations=1)
+	img = cv2.bitwise_not(img)
 	threshed_image = cv2.adaptiveThreshold(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,41,6)
 	return threshed_image
 
@@ -24,7 +27,9 @@ def extractCharacters(binImg, targetResolution = (25,25), thresh_lower = 180, th
 	pc.processCharacters(characters)
 	for char in characters:
 		squareImage(char)
+		cv2.erode(char.image,np.ones((3,3),np.uint8),iterations=1)
 		resize(char,targetResolution)
+		
 	
 	return characters
 
