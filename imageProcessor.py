@@ -16,7 +16,7 @@ def extractCharacters(binImg, targetResolution = (25,25), thresh_lower = 180, th
 	characters = [] 
 	for c in contours:
 		x, y, w, h = cv2.boundingRect(c)
-		if (h+w>25 and h+w<200): #TODO improve; disregard tiny and huge components
+		if (h+w>25 and h+w<(150)): #TODO improve; disregard tiny and huge components
 			img = binImg[y:y+h,x:x+w]
 			char = ch.Character(img,x,y,w,h)
 			characters.append(char)
@@ -66,7 +66,7 @@ def drawClassifiedCharacters(image, classifier, characters):
 	return image
 	
 def webcam(classifier):
-	cv2.namedWindow("preview")
+	cv2.namedWindow("preview", cv2.WINDOW_NORMAL)
 	vc = cv2.VideoCapture(0)
 	
 	if vc.isOpened():
@@ -76,6 +76,7 @@ def webcam(classifier):
 	
 	while rval:
 		#cv2.imshow("preview", frame)
+		cv2.resizeWindow("preview", 640, 480)
 		rval, frame = vc.read()
 		key = cv2.waitKey(20)
 		if key == 27: # ESC
