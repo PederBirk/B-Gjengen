@@ -4,9 +4,10 @@ import numpy as np
 import processCharacters as pc
 
 def getImgMat(path, thresh_lower = 180, thresh_upper = 255):
-	img = cv2.pyrDown(cv2.imread(path, cv2.IMREAD_UNCHANGED))
-	kernel = np.ones((7,7),np.float32)/49
-	img = cv2.filter2D(img,-1,kernel)
+	img = cv2.pyrDown(cv2.imread(path, cv2.COLOR_BGR2GRAY))
+	kernel = np.ones((6,6),np.float32)/36
+	#img = cv2.filter2D(img,-1,kernel)
+	#img = cv2.bitwise_not(img)
 	threshed_image = cv2.adaptiveThreshold(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,41,6)
 	return threshed_image
 
@@ -15,7 +16,7 @@ def extractCharacters(binImg, targetResolution = (25,25), thresh_lower = 180, th
 	characters = [] 
 	for c in contours:
 		x, y, w, h = cv2.boundingRect(c)
-		if (h+w>25 and h+w<200): #disregard tiny and huge components
+		if (h+w>25 and h+w<200): #TODO improve; disregard tiny and huge components
 			img = binImg[y:y+h,x:x+w]
 			char = ch.Character(img,x,y,w,h)
 			characters.append(char)
@@ -34,7 +35,7 @@ def squareImage(char):
 		diff = w-h
 		padding = int(diff/2.0)
 		dim = (padding,w)
-		paddingMat = 255*np.ones(dim,dtype=np.uint8)
+		paddingMat = 225*np.ones(dim,dtype=np.uint8)
 		char.image = np.concatenate((paddingMat,char.image,paddingMat),0)
 	elif h > w:
 		diff = h-w
@@ -52,4 +53,48 @@ def squareImage(char):
 def resize(char,targetResolution):
 	char.image = cv2.resize(char.image,targetResolution)
 	ret, char.image = cv2.threshold(char.image, 128, 255, cv2.THRESH_BINARY)
+
+def drawCharacterBounds(image, characters):
+	for c in characters:
+		cv2.rectangle(image, (c.xPos, c.yPos), (c.xPos + c.width, c.yPos + c.height), (0, 0, 0))
+	return image
+
+def drawClassifiedCharacters(image, classifier, characters):
+	for c in characters:
+		classifier.classify(c)
+		cv2.putText(image, c.symbol, (c.xPos, c.yPos), cv2.FONT_HERSHEY_PLAIN, 2, 0)
+	return image
 	
+def webcam(classifier):
+	cv2.namedWindow("preview")
+	vc = cv2.VideoCapture(0)
+	
+	if vc.isOpened():
+		rval, frame = vc.read()
+	else:
+		rval = False
+	
+	while rval:
+		#cv2.imshow("preview", frame)
+		rval, frame = vc.read()
+		key = cv2.waitKey(20)
+		if key == 27: # ESC
+			break
+		
+		# treat frame
+		cv2.imwrite("screencap.jpg", frame)
+		threshed_img = getImgMat("screencap.jpg")
+		#cv2.waitKey(0)
+		#cv2.imshow("preview", threshed_img)
+	
+		characters = extractCharacters(threshed_img, (45,45))
+		imgWithBounds = drawCharacterBounds(threshed_img, characters)
+		#cv2.waitKey(0)
+		#cv2.imshow("preview", imgWithBounds)
+
+		classifiedImg = drawClassifiedCharacters(imgWithBounds, classifier, characters)
+		cv2.imshow("preview", classifiedImg)
+		#cv2.waitKey(0)
+	
+	cv2.destroyWindow("preview")
+

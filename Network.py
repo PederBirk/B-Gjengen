@@ -64,7 +64,7 @@ class Network():
 		delta = self.costDerivative(activations[-1], expectedOutput) * sigmoidPrime(zs[-1]) #Find derivative of cost function
 		nablaB[-1] = delta
 		nablaW[-1] = np.dot(delta, activations[-2].transpose())
-		
+
 		for layer in range(2, self.numLayers): #starting at 2nd to last layer, work backwards and find gradient for biases and weights
 			z = zs[-layer]
 			sp = sigmoidPrime(z)
@@ -75,6 +75,7 @@ class Network():
 		return (nablaB, nablaW)
     
 	def save(self, filename):
+		print("saving network to file " + filename)
 		data = {"nodesInLayer": self.nodesInLayer, "weights": [w.tolist() for w in self.weights], "biases": [b.tolist() for b in self.biases]}
 		f = open(filename, "w")
 		json.dump(data, f)
@@ -98,6 +99,7 @@ def load(filename):
     net = Network(data["nodesInLayer"])
     net.weights = [np.array(w) for w in data["weights"]]
     net.biases = [np.array(b) for b in data["biases"]]
+    print("loaded network from " + filename)
     return net
 	
 	
