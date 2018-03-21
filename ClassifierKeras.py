@@ -1,6 +1,4 @@
 import Network as nw
-import numpy as np
-import cv2
 
 class Classifier:
 	
@@ -9,8 +7,8 @@ class Classifier:
 		self.network = network
 
 	def classify(self,char):
-		activation= self.network.feedForward(char.image.reshape((2025,1))/255)
-		char.symbol= self.getSymbol(activation) 
+		activation= self.network.predict(char.image/255)
+		char.symbol= self.getSymbol(activation)
 		
 	def getSymbol(self,activation):
 		maxactivation = activation[0]
@@ -23,7 +21,7 @@ class Classifier:
 		return self.symbols[maxindex]
 	
 	def getProbSortedSymbols(self,char):
-		activation= self.network.feedForward(char.image)
+		activation= self.network.predict(char.image/255)
 		zipped=zip(activation,range(len(activation)))
 		zipped.sort()
 		index = []
