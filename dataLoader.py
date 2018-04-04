@@ -4,15 +4,26 @@ import gzip
 import pickle
 from math import floor
 from os import listdir
+from random import shuffle
 
 # reads raw image data from inPath into a two lists (train and test) of tuples consisting of
 # input data and correct output; for training data the correct output is vectorized, but for test data
 # it is the index of the symbol for compatibility with feedforward's output
 def pickleJPEGData(inPath, symbols): # TODO validation data?
 	data = { 'train': [], 'test': [] }
+	
+	#Determine which symbols has fewest samples
+	samples = 1000000000
+	for symbol in symbols:
+		path = inPath + symbol + '/'
+		nFiles = len(listdir(path))
+		if nFiles < samples:
+			samples = nFiles
+			
 	for symbol in symbols:
 		path = inPath + symbol + '/'
 		files = [ readImage(inPath + symbol + '/' + f) for f in listdir(path) ]
+		files = files[0:samples-1]
 		nTrain = floor(len(files) * 0.9)
 		data['train'] = [(trainInput, vectorize(symbol, symbols)) for trainInput in files[:nTrain]]
 		data['test'] = [(testInput, vectorize(symbol, symbols)) for testInput in files[nTrain:]]
@@ -25,10 +36,12 @@ def vectorize(symbol, symbols):
 	output[symbols.index(symbol)] = 1
 	return output
 
-#Read a single image into a binary column vector
+#Read a single image into a binary column vector, diliates symbol
 def readImage(path):
 	img = cv2.imread(path,cv2.IMREAD_GRAYSCALE)
-	# tresh, binImg = cv2.threshold(img, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+	img = cv2.bitwise_not(img)
+	img = cv2.dilate(img,np.ones((3,3),np.uint8),iterations=1)
+	img = cv2.bitwise_not(img)
 	return img
 
 def loadPickledData(path, symbols):

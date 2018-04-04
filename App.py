@@ -14,15 +14,15 @@ pathToData = './data/'
 
 # data = dl.loadPickledData(pathToData, symbols)
 # rain network
-json_file = open('model_shuffled.json', 'r')
+json_file = open('models/model_balanced.json', 'r')
 loaded_model_json = json_file.read()
 json_file.close()
 loaded_model = model_from_json(loaded_model_json)
 # load weights into new model
-loaded_model.load_weights("model_shuffled.h5")
+loaded_model.load_weights("models/model_balanced.h5")
 classifier = ClassifierKeras(symbols,loaded_model)
 
-imgPath = 'C:\\Users\\t_tor\\Unsynced\\extracted_images\\2\\exp32472 .jpg'
+imgPath = 'C:\\Users\\t_tor\\OneDrive - NTNU\\Documents\\Skule\\TMA4850 EiT\\B-Gjengen\\images\\mnistEx.png'
 img = ip.getImgMat(imgPath)
 cv2.imshow("test", img)
 if cv2.waitKey(0) & 0xff == 27:

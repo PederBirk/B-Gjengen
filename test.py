@@ -15,11 +15,11 @@ pathToData = './data/'
 
 # data = dl.loadPickledData(pathToData, symbols)
 # rain network
-json_file = open('model.json', 'r')
+json_file = open('models/model_balanced.json', 'r')
 loaded_model_json = json_file.read()
 json_file.close()
 loaded_model = model_from_json(loaded_model_json)
 # load weights into new model
-loaded_model.load_weights("model.h5")
+loaded_model.load_weights("models/model_balanced.h5")
 
 ip.webcam(ClassifierKeras(symbols, loaded_model))

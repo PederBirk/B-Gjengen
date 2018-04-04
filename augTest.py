@@ -6,12 +6,12 @@ Gets to 99.25% test accuracy after 12 epochs
 
 from __future__ import print_function
 import keras
-from keras.datasets import mnist
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
 import dataLoader as dl
+from keras.preprocessing.image import ImageDataGenerator
 
 batch_size = 128
 epochs = 12
@@ -45,8 +45,6 @@ else:
 
 x_train = x_train.astype('float32')
 x_test = x_test.astype('float32')
-x_train /= 255
-x_test /= 255
 print('x_train shape:', x_train.shape)
 print(x_train.shape[0], 'train samples')
 print(x_test.shape[0], 'test samples')
@@ -70,6 +68,20 @@ model.add(Dense(num_classes, activation='softmax'))
 model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.Adadelta(),
               metrics=['accuracy'])
+
+train_datagen = ImageDataGenerator(
+	 rotation_range=20,
+    rescale=1. / 255,
+    shear_range=0.2,
+    zoom_range=0.2,
+    horizontal_flip=False)
+
+test_datagen = ImageDataGenerator(rescale=1. / 255)
+
+model.fit_generator(train_datagen.flow(x_train, y_train, batch_size=batch_size, shuffle=True),
+                    steps_per_epoch=len(x_train) / batch_size, epochs=epochs, 
+                    validation_data=test_datagen.flow(x_test, y_test, batch_size=batch_size), 
+                    validation_steps=x_test.shape[0]/batch_size)
 
 model.fit(x_train, y_train,
           batch_size=batch_size,

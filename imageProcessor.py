@@ -4,17 +4,17 @@ import numpy as np
 import processCharacters as pc
 
 def getImgMat(path, thresh_lower = 180, thresh_upper = 255):
-	img = cv2.pyrDown(cv2.imread(path, cv2.COLOR_BGR2GRAY))
+	img = cv2.imread(path, cv2.COLOR_BGR2GRAY)
 	#img = cv2.GaussianBlur(img,(3,3),0)
 	#kernel = np.ones((3,3),np.float32)/9
 	#img = cv2.filter2D(img,-1,kernel)
-	img = cv2.bitwise_not(img)
-	img = cv2.dilate(img,np.ones((3,3),np.uint8),iterations=1)
-	img = cv2.bitwise_not(img)
+	#img = cv2.bitwise_not(img)
+	#img = cv2.dilate(img,np.ones((3,3),np.uint8),iterations=1)
+	#img = cv2.bitwise_not(img)
 	threshed_image = cv2.adaptiveThreshold(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,41,6)
 	return threshed_image
 
-def extractCharacters(binImg, targetResolution = (25,25), thresh_lower = 180, thresh_upper = 255):
+def extractCharacters(binImg, targetResolution = (45,45), thresh_lower = 180, thresh_upper = 255):
 	image, contours, hier = cv2.findContours(binImg, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 	characters = [] 
 	for c in contours:
@@ -27,7 +27,9 @@ def extractCharacters(binImg, targetResolution = (25,25), thresh_lower = 180, th
 	pc.processCharacters(characters)
 	for char in characters:
 		squareImage(char)
-		cv2.erode(char.image,np.ones((3,3),np.uint8),iterations=1)
+		#char.image = cv2.bitwise_not(char.image)
+		#char.image = cv2.erode(char.image,np.ones((3,3),np.uint8),iterations=1)
+		#char.image = cv2.bitwise_not(char.image)
 		resize(char,targetResolution)
 		
 	
@@ -67,7 +69,7 @@ def drawCharacterBounds(image, characters):
 def drawClassifiedCharacters(image, classifier, characters):
 	for c in characters:
 		classifier.classify(c)
-		cv2.putText(image, c.symbol, (c.xPos, c.yPos), cv2.FONT_HERSHEY_PLAIN, 2, 0)
+		cv2.putText(image, c.symbol, (c.xPos, c.yPos), cv2.FONT_HERSHEY_PLAIN, 2, 1)
 	return image
 	
 def webcam(classifier):
