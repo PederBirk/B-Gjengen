@@ -2,24 +2,20 @@ import cv2
 import Character as ch
 import numpy as np
 import processCharacters as pc
+from math import pow
 
 def getImgMat(path, thresh_lower = 180, thresh_upper = 255):
 	img = cv2.imread(path, cv2.COLOR_BGR2GRAY)
-	#img = cv2.GaussianBlur(img,(3,3),0)
-	#kernel = np.ones((3,3),np.float32)/9
-	#img = cv2.filter2D(img,-1,kernel)
-	#img = cv2.bitwise_not(img)
-	#img = cv2.dilate(img,np.ones((3,3),np.uint8),iterations=1)
-	#img = cv2.bitwise_not(img)
 	threshed_image = cv2.adaptiveThreshold(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,41,6)
 	return threshed_image
 
 def extractCharacters(binImg, targetResolution = (45,45), thresh_lower = 180, thresh_upper = 255):
 	image, contours, hier = cv2.findContours(binImg, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+	imgHeight, imgWidth = image.shape
 	characters = [] 
 	for c in contours:
 		x, y, w, h = cv2.boundingRect(c)
-		if (h+w>25 and h+w<(150)): #TODO improve; disregard tiny and huge components
+		if (pow(max(h,w),2)>(imgHeight*imgWidth)/700 and pow(max(h,w),2)<(imgHeight*imgWidth)/5): #TODO improve; disregard tiny and huge components
 			img = binImg[y:y+h,x:x+w]
 			char = ch.Character(img,x,y,w,h)
 			characters.append(char)
