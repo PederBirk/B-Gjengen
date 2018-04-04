@@ -25,7 +25,7 @@ symbols = ['0','1','2','3','4','5','6','7','8','9', '=', 'x', '+','-','y']
 
 num_classes = len(symbols)
 
-dl.pickleJPEGData(dataPath, symbols)
+#dl.pickleJPEGData(dataPath, symbols)
 
 data = dl.loadPickledData(dataPath, symbols)
 
@@ -33,9 +33,6 @@ x_train = data['training-input']
 y_train = data['training-output']
 x_test = data['test-input']
 y_test = data['test-output']
-
-
-#(x_train, y_train), (x_test, y_test) = mnist.load_data()
 
 if K.image_data_format() == 'channels_first':
     x_train = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols)
@@ -78,6 +75,7 @@ model.fit(x_train, y_train,
           batch_size=batch_size,
           epochs=epochs,
           verbose=1,
+			 shuffle=True,
           validation_data=(x_test, y_test))
 score = model.evaluate(x_test, y_test, verbose=0)
 print('Test loss:', score[0])
