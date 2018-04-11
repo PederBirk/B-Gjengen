@@ -1,4 +1,5 @@
 from equationParser import parseEquation
+from equationParser import toSymPyFormat
 import imageProcessor as ip
 import cv2
 from ClassifierKeras import ClassifierKeras
@@ -28,8 +29,16 @@ for line in lines:
 		print(str, end="\t")
 	print("")
 
+eqs = toSymPyFormat(lines)
+	
+for eq in eqs:
+	print(eq)
+
 img = cv2.pyrDown(img)
 cv2.imshow("test", img)
  
 if cv2.waitKey(0) & 0xff == 27:
     cv2.destroyAllWindows()
+
+for char in chars:
+	char.show()

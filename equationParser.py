@@ -1,4 +1,6 @@
 from math import fabs, floor
+from sympy import Symbol
+from sympy import solve
 
 
 def getCenter(char):
@@ -47,7 +49,7 @@ def groupCharsInLine(chars, deltaX):
 def parseEquation(chars):
 	avgWidth, avgHeight = getAvgCharSize(chars)
 	lines = getLines(chars, avgHeight/2)
-	lines = [groupCharsInLine(line, avgWidth*1.5) for line in lines]
+	lines = [groupCharsInLine(line, avgWidth*3) for line in lines]
 	ret = []
 	'''
 	for line in lines:
@@ -55,4 +57,36 @@ def parseEquation(chars):
 			ret.append(((group[0].xPos, group[0].yPos),(group[-1].xPos+group[-1].width, group[-1].yPos+group[-1].height)))
 	'''
 	return lines
+
+def toSymPyFormat(lines):
+	eqs = []
+	for line in lines:
+		for group in line:
+			eq = group[0].symbol
+			for i in range(1,len(group)):
+				if not (group[i].symbol == "+" or group[i].symbol == "-" or group[i].symbol == "=" or group[i-1].symbol == "+" or group[i-1].symbol == "-" or group[i-1].symbol == "="):
+					 eq += "*"
+					 eq += group[i].symbol
+				elif group[i].symbol == "=":
+					eq += "-("
+				else:
+					eq += group[i].symbol
+			eq += ")"
+			eqs.append(eq)
+	return eqs
+			
+def solveSingleEq(eq):
+	x = Symbol("x")
+	y = Symbol("y")
+	if "x" in eq:
+		sol = solve(eq,x)
+		var = "x"
+	elif "y" in eq:
+		sol = solve(eq,y)
+		var = "x"
+	else:
+		print("Equation does not contain x or y!")
+	print(var + " = " + str(sol[0]))
+		
+	
 			
