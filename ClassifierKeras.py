@@ -19,7 +19,7 @@ class ClassifierKeras:
 			if activation[i]>maxactivation:
 				maxactivation=activation[i]
 				maxindex=i
-		if maxactivation < 0.6: return "?"
+		if maxactivation < 0.01: return "?"
 		return self.symbols[maxindex]
 	
 	def getProbSortedSymbols(self,char):

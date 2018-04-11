@@ -4,18 +4,18 @@ import cv2
 from ClassifierKeras import ClassifierKeras
 from keras.models import model_from_json
 
-img = ip.getImgMat('ex.png')
+img = ip.getImgMat('images/twoEq.jpg')
 chars = ip.extractCharacters(img, (45,45))
 lines = parseEquation(chars)
 
 symbols = ['0','1','2','3','4','5','6','7','8','9', '=', 'x', '+', '-', 'y']
 
-json_file = open('model.json', 'r')
+json_file = open('models/model_balanced.json', 'r')
 loaded_model_json = json_file.read()
 json_file.close()
 loaded_model = model_from_json(loaded_model_json)
 # load weights into new model
-loaded_model.load_weights("model.h5")
+loaded_model.load_weights("models/model_balanced.h5")
 
 classifier = ClassifierKeras(symbols, loaded_model)
 

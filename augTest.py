@@ -12,9 +12,10 @@ from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
 import dataLoader as dl
 from keras.preprocessing.image import ImageDataGenerator
+import plotTraining as pt
 
 batch_size = 128
-epochs = 12
+epochs = 30
 
 # input image dimensions
 img_rows, img_cols = 45,45
@@ -78,17 +79,13 @@ train_datagen = ImageDataGenerator(
 
 test_datagen = ImageDataGenerator(rescale=1. / 255)
 
-model.fit_generator(train_datagen.flow(x_train, y_train, batch_size=batch_size, shuffle=True),
+history = model.fit_generator(train_datagen.flow(x_train, y_train, batch_size=batch_size, shuffle=True),
                     steps_per_epoch=len(x_train) / batch_size, epochs=epochs, 
                     validation_data=test_datagen.flow(x_test, y_test, batch_size=batch_size), 
                     validation_steps=x_test.shape[0]/batch_size)
 
-model.fit(x_train, y_train,
-          batch_size=batch_size,
-          epochs=epochs,
-          verbose=1,
-			 shuffle=True,
-          validation_data=(x_test, y_test))
 score = model.evaluate(x_test, y_test, verbose=0)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
+
+pt.plot_training_score(history)

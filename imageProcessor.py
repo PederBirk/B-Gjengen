@@ -15,7 +15,7 @@ def extractCharacters(binImg, targetResolution = (45,45), thresh_lower = 180, th
 	characters = [] 
 	for c in contours:
 		x, y, w, h = cv2.boundingRect(c)
-		if (pow(max(h,w),2)>(imgHeight*imgWidth)/700 and pow(max(h,w),2)<(imgHeight*imgWidth)/5): #TODO improve; disregard tiny and huge components
+		if (pow(max(h,w),2)>(imgHeight*imgWidth)/1200 and pow(max(h,w),2)<(imgHeight*imgWidth)/5): #TODO improve; disregard tiny and huge components
 			img = binImg[y:y+h,x:x+w]
 			char = ch.Character(img,x,y,w,h)
 			characters.append(char)
