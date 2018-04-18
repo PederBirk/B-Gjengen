@@ -1,7 +1,7 @@
 import cv2
-import numpy as np
 import Network
 
+#Representation of a character in an equation
 class Character:
 	
 	symbol = None #The symbol the neural network has identified

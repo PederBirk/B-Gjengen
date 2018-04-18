@@ -1,15 +1,13 @@
 import cv2
 import numpy as np
-import gzip
 import pickle
 from math import floor
 from os import listdir
-from random import shuffle
 
 # reads raw image data from inPath into a two lists (train and test) of tuples consisting of
 # input data and correct output; for training data the correct output is vectorized, but for test data
 # it is the index of the symbol for compatibility with feedforward's output
-def pickleJPEGData(inPath, symbols): # TODO validation data?
+def pickleJPEGData(inPath, symbols):
 	data = { 'train': [], 'test': [] }
 	
 	#Determine which symbols has fewest samples
@@ -30,7 +28,7 @@ def pickleJPEGData(inPath, symbols): # TODO validation data?
 		with open(inPath + symbol + '.pkl', 'wb') as f:
 			pickle.dump(data, f)
 
-#Create unit vector representation of symbol. Indexing is determined by 'symbols' list
+#Create one-hot representation of symbol. Indexing is determined by 'symbols' list
 def vectorize(symbol, symbols):
 	output = np.zeros(len(symbols))
 	output[symbols.index(symbol)] = 1
@@ -44,6 +42,7 @@ def readImage(path):
 	img = cv2.bitwise_not(img)
 	return img
 
+#Read pickle files into numpy arrays for training and test data
 def loadPickledData(path, symbols):
 	data = { 'training-input': [], 'training-output': [], 'test-input': [], 'test-output': [] }
 	print("loading symbols...")

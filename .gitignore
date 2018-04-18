@@ -4,3 +4,5 @@ data/*
 *.swp
 NOTES
 shell.nix
+images/*
+models/*

@@ -9,8 +9,9 @@ class Network():
 		self.nodesInLayer = nodesInLayer
 		self.biases = [np.random.randn(y, 1) for y in nodesInLayer[1:]]
 		self.weights = [np.random.randn(y, x) for x, y in zip(nodesInLayer[:-1], nodesInLayer[1:])]
-		
-	def feedForward(self, input): #Push data trough network, get prediction
+	
+	#Push data trough network, get prediction	
+	def feedForward(self, input):
 		h = self.numLayers - 2
 		a = [sigmoid(np.dot(self.weights[0],input)+self.biases[0])]
 		for i in range(1,h+1):
@@ -73,16 +74,15 @@ class Network():
 			nablaW[-layer] = np.dot(delta, activations[-layer-1].transpose())
 		
 		return (nablaB, nablaW)
-    
+   
+   #Save network to json file
 	def save(self, filename):
 		print("saving network to file " + filename)
 		data = {"nodesInLayer": self.nodesInLayer, "weights": [w.tolist() for w in self.weights], "biases": [b.tolist() for b in self.biases]}
 		f = open(filename, "w")
 		json.dump(data, f)
 		f.close()
-		
-		
-		
+			
 	#Runs test data and returns % of data correctly indentified
 	def evaluate(self, testData):
 		testResults = [(np.argmax(self.feedForward(x)),y) for (x,y) in testData]
@@ -92,6 +92,7 @@ class Network():
 	def costDerivative(self, output, expectedOutput):
 		return (output-expectedOutput)
 
+#Load a network from a json file
 def load(filename):
     f = open(filename, "r")
     data = json.load(f)
@@ -102,10 +103,11 @@ def load(filename):
     print("loaded network from " + filename)
     return net
 	
-	
+#Sigmoid activation function	
 def sigmoid(z):
 	return 1.0/(1.0+np.exp(-z))
-	
+
+#Derivative of sigmoid function
 def sigmoidPrime(z):
 	return sigmoid(z)*(1-sigmoid(z))
 

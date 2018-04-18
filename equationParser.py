@@ -1,11 +1,14 @@
-from math import fabs, floor
 from sympy import Symbol
 from sympy import solve
+from sympy.solvers.solveset import linsolve
+from sympy.parsing.sympy_parser import parse_expr
+import cv2
 
-
+#Get center position of character bounding box
 def getCenter(char):
 	return(char.xPos + char.width/2, char.yPos + char.height/2)
-	
+
+#Get the average size of the character boudning boxes	
 def getAvgCharSize(chars):
 	l = len(chars)
 	if l == 0:
@@ -16,14 +19,17 @@ def getAvgCharSize(chars):
 		ySum += c.height
 	return (xSum/l, ySum/l)
 
+#Sort characters by the x position of the center of the bounding box
 def sortCharsByX(chars):
 	chars.sort(key=lambda x:x.xPos+x.width/2)
 	return chars
-	
+
+#Sort characters by the y position of the center of the bounding box	
 def sortCharsByY(chars):
 	chars.sort(key=lambda x:x.yPos+x.height/2)
 	return chars
-	
+
+#Group characters who are on the same line
 def getLines(chars, deltaY):
 	chars = sortCharsByY(chars)
 	ret = [[chars[0]]]
@@ -35,6 +41,7 @@ def getLines(chars, deltaY):
 		ret[-1].append(chars[i+1])
 	return ret
 
+#Group adjecent characters in a line
 def groupCharsInLine(chars, deltaX):
 	sortCharsByX(chars)
 	ret = [[chars[0]]]
@@ -45,19 +52,15 @@ def groupCharsInLine(chars, deltaX):
 			ret.append([])
 		ret[-1].append(chars[i+1])
 	return ret
-	
+
+#Group all characters in image into individual equations	
 def parseEquation(chars):
 	avgWidth, avgHeight = getAvgCharSize(chars)
 	lines = getLines(chars, avgHeight/2)
 	lines = [groupCharsInLine(line, avgWidth*3) for line in lines]
-	ret = []
-	'''
-	for line in lines:
-		for group in line:
-			ret.append(((group[0].xPos, group[0].yPos),(group[-1].xPos+group[-1].width, group[-1].yPos+group[-1].height)))
-	'''
 	return lines
 
+#Prepare equation to be input to SymPy 
 def toSymPyFormat(lines):
 	eqs = []
 	for line in lines:
@@ -74,19 +77,49 @@ def toSymPyFormat(lines):
 			eq += ")"
 			eqs.append(eq)
 	return eqs
-			
-def solveSingleEq(eq):
+
+#Solve a single equation with respect to the variable specified in the arguments		
+def solveSingleEq(eq, var):
+	sym = Symbol(var)
+	sol = solve(eq,sym)
+	print(var + " = " + str(sol[0]))
+	return sol
+
+#Solve a system of two eqautions, where x and y are the unknown	
+def solveSystemOfEqs(eqs):
 	x = Symbol("x")
 	y = Symbol("y")
-	if "x" in eq:
-		sol = solve(eq,x)
-		var = "x"
-	elif "y" in eq:
-		sol = solve(eq,y)
-		var = "x"
-	else:
-		print("Equation does not contain x or y!")
-	print(var + " = " + str(sol[0]))
-		
+	sol = linsolve([parse_expr(eqs[0],evaluate=0), parse_expr(eqs[1], evaluate=0)],(x,y))
+	x_sol,y_sol = next(iter(sol))
+	print ("x = " + str(x_sol) + ", y = " + str(y_sol))
+	return (x_sol, y_sol)
+
+#Find the boudning box around an equation
+def findEquationBoundingBox(group):
+	x_min = group[0].xPos
+	x_max = group[-1].xPos + group[-1].width
+	y_min = 1000000
+	y_max = -y_min
+	for char in group:
+		y_min = min(y_min,char.yPos)
+		y_max = max(y_max,char.yPos + char.height)
 	
+	return(x_min,y_min,x_max,y_max)
+
+#Draw the bounding box and solution for all equation which can be solved in an image	
+def drawSolvedEquations(lines, image, withRespectTo):
+	sym = Symbol(withRespectTo)
+	eqs = toSymPyFormat(lines)
+	i = 0
+	for line in lines:
+		for group in line:
+			try:
+				sol = solve(eqs[i],sym)
+				x_min,y_min,x_max,y_max = findEquationBoundingBox(group)
+				cv2.rectangle(image, (x_min,y_min), (x_max,y_max), (0, 0, 0))
+				string = withRespectTo + " = " + str(sol[0])
+				cv2.putText(image, string, (x_max + 10, int((y_max+y_min)/2)), cv2.FONT_HERSHEY_PLAIN, 1.5, 2)
+				i += 1
+			except Exception:			
+				i += 1
 			
