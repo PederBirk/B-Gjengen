@@ -7,10 +7,13 @@ from keras import backend as K
 import dataLoader as dl
 from matplotlib import pyplot as plt
 from keras.preprocessing.image import ImageDataGenerator
+import numpy as np
+
 
 
 #Train a CNN using Keras
 def trainKerasNetwork():
+	K.clear_session()
 	batch_size = 128
 	epochs = 12
 	
@@ -79,9 +82,82 @@ def trainKerasNetwork():
 	print('Test loss:', score[0])
 	print('Test accuracy:', score[1])
 	return history
+
+#Train a FC-NN using Keras
+def trainKerasFCNetwork():
+	K.clear_session()
+	batch_size = 128
+	epochs = 50
+	
+	# input image dimensions
+	img_rows, img_cols = 45,45
+	n_pixels = img_rows*img_cols
+	
+	
+	#Load training and test data
+	dataPath = "C:\\Users\\t_tor\\Unsynced\\extracted_images\\"
+	
+	symbols = ['0','1','2','3','4','5','6','7','8','9', '=', 'x', '+','-','y']
+	
+	num_classes = len(symbols)
+	
+	data = dl.loadPickledData(dataPath, symbols)
+	
+	x_train = data['training-input']
+	y_train = data['training-output']
+	x_test = data['test-input']
+	y_test = data['test-output']
+	
+	n_training_samples = len(y_train)
+	n_test_samples = len(y_test)
+	
+	x_train_new = np.zeros((n_training_samples,n_pixels))
+	for i in range(n_training_samples):
+		x_train_new[i] = x_train[i].flatten()
+		
+	x_test_new = np.zeros((n_test_samples,n_pixels))
+	for i in range(n_test_samples):
+		x_test_new[i] = x_test[i].flatten()
+		
+	x_train = x_train_new
+	x_test = x_test_new
+	
+	x_train = x_train.astype('float32')
+	x_test = x_test.astype('float32')
+	x_train /= 255
+	x_test /= 255
+	print('x_train shape:', x_train.shape)
+	print(x_train.shape[0], 'train samples')
+	print(x_test.shape[0], 'test samples')
+
+	#Define model
+	model = Sequential()
+	model.add(Dense(30, activation='sigmoid',input_shape=(n_pixels,)))
+	model.add(Dense(num_classes, activation='sigmoid'))
+	
+	model.compile(loss=keras.losses.categorical_crossentropy,
+	              optimizer=keras.optimizers.Adadelta(),
+	              metrics=['accuracy'])
+	
+	#Train model
+	history = model.fit(x_train, y_train,
+	          batch_size=batch_size,
+	          epochs=epochs,
+	          verbose=1,
+				 shuffle=True,
+	          validation_data=(x_test, y_test))
+	
+	#Evaluate model performance
+	score = model.evaluate(x_test, y_test, verbose=0)
+	print('Test loss:', score[0])
+	print('Test accuracy:', score[1])
+	return (history,model)
+
+history,model = trainKerasFCNetwork()
 	
 #Train a CNN using Keras with data augmentation	
 def trainKerasNetworkWithDataAugmentation():
+	K.clear_session()
 	batch_size = 128
 	epochs = 30
 	

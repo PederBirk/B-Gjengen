@@ -118,7 +118,7 @@ def drawSolvedEquations(lines, image, withRespectTo):
 				x_min,y_min,x_max,y_max = findEquationBoundingBox(group)
 				cv2.rectangle(image, (x_min,y_min), (x_max,y_max), (0, 0, 0))
 				string = withRespectTo + " = " + str(sol[0])
-				cv2.putText(image, string, (x_max + 10, int((y_max+y_min)/2)), cv2.FONT_HERSHEY_PLAIN, 1.5, 2)
+				cv2.putText(image, string, (x_min+50, y_max+20), cv2.FONT_HERSHEY_PLAIN, 1.5, 2)
 				i += 1
 			except Exception:			
 				i += 1
